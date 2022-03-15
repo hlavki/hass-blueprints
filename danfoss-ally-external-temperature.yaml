@@ -72,8 +72,7 @@ action:
       seconds: '{{ range(1, 21)|random }}'
   - service: number.set_value
     data:
-      value: >-
-        {{ (states(temperature_sensor)|float *100)|int }}
+      value: '{{ (states(temperature_sensor)|float *100)|int }}'
     target:
       entity_id: !input danfoss_external_room_temp_value
 mode: restart
