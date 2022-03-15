@@ -15,7 +15,6 @@ blueprint:
       selector:
         entity:
           domain: number
-          device_class: external_measured_room_sensor
     temperature_sensor:
       name: Temperature sensor in Celsius
       description: This sensor acts as external temperature sensor for your Ally
