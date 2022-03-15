@@ -1,0 +1,78 @@
+blueprint:
+  name: Danfoss Ally TRV 1.18 set external temperature
+  description: Set external measured temperature to Danfoss Ally TRV firmware 1.18 with Radiator Covered = true
+  domain: automation
+  input:
+    danfoss_trv:
+      name: Danfoss TRV
+      description: This is Danfoss Ally climate TRV entity with firmware 1.18 and Radiator Covered = true
+      selector:
+        entity:
+          domain: climate
+    danfoss_external_room_temp_value:
+      name: Danfoss External Measured Room Sensor
+      description: This is Danfoss Ally external room temperature entity value
+      selector:
+        entity:
+          domain: number
+          device_class: external_measured_room_sensor
+    temperature_sensor:
+      name: Temperature sensor in Celsius
+      description: This sensor acts as external temperature sensor for your Ally
+      selector:
+        entity:
+          domain: sensor
+          device_class: temperature
+    automation_entity:
+      name: Automation entity_id
+      description: This automation entity_id (only low case, underscores)
+      default: "automation.new_automation"
+      selector:
+        entity:
+          domain: automation
+
+variables:
+    temperature_sensor: !input temperature_sensor
+
+trigger:
+  - platform: state
+    entity_id: !input temperature_sensor
+    id: trig-temp
+  - platform: state
+    entity_id: !input automation_entity 
+    attribute: last_triggered
+    for:
+      hours: 0
+      minutes: 30
+      seconds: 0
+condition:
+  - condition: numeric_state
+    entity_id: !input temperature_sensor
+    above: '0'
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: trig-temp
+        sequence:
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: >-
+                      {{ (utcnow()|as_timestamp -
+                      this.attributes.last_triggered|as_timestamp)/60 <5 }}
+                sequence:
+                  - delay:
+                      minutes: >-
+                        {{ 5 - (utcnow()|as_timestamp -
+                        this.attributes.last_triggered|as_timestamp)/60 }}
+            default: []
+    default: []
+  - delay:
+      seconds: '{{ range(1, 21)|random }}'
+  - service: number.set_value
+    target:
+      entity_id: !input danfoss_external_room_temp_value
+    data:
+      value: {{ (states(temperature_sensor)|float *100)|int }}
+mode: restart
