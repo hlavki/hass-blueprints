@@ -74,5 +74,5 @@ action:
     target:
       entity_id: !input danfoss_external_room_temp_value
     data:
-      value: {{ (states(temperature_sensor)|float *100)|int }}
+      value: '{{ (states(temperature_sensor)|float *100)|int }}'
 mode: restart
