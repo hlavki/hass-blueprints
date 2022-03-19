@@ -21,8 +21,8 @@ blueprint:
       selector:
         device:
           integration: mqtt
-          manufacturer: IKEA of Sweden
-          model: Remote Control N2
+          manufacturer: IKEA
+          model: STYRBAR remote control N2 (E2001/E2002)
     light:
       name: Light(s)
       description: The light(s) to control
