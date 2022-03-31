@@ -12,9 +12,9 @@ blueprint:
       description: The remote that will control the lights
       selector:
         device:
-          integration: zha
-          manufacturer: 'IKEA of Sweden'
-          model: 'TRADFRI on/off switch'
+          integration: mqtt
+          manufacturer: 'IKEA'
+          model: 'TRADFRI ON/OFF switch'
     light:
       name: Light
       description: The lights that will be controlled
