@@ -7,14 +7,20 @@ blueprint:
     You can turn the lights On / Off, or hold the buttons to dim the lights"
   domain: automation
   input:
-    remote:
-      name: Remote
-      description: The remote that will control the lights
+    # remote:
+    #   name: Remote
+    #   description: The remote that will control the lights
+    #   selector:
+    #     device:
+    #       integration: mqtt
+    #       manufacturer: 'IKEA'
+    #       model: 'TRADFRI ON/OFF switch (E1743)'
+    sensor_entity:
+      name: Switch
+      description: The action sensor for listening state changes
       selector:
-        device:
-          integration: zha
-          manufacturer: 'IKEA of Sweden'
-          model: 'TRADFRI on/off switch'
+        entity:
+          domain: sensor
     light:
       name: Light
       description: The lights that will be controlled
@@ -25,19 +31,15 @@ blueprint:
 mode: restart
 trigger:
 - platform: event
-  event_type: zha_event
+  event_type: state_changed
   event_data:
-    device_id: !input 'remote'
+    entity_id: !input sensor_entity
 action:
 - variables:
-    command: "{{ trigger.event.data.command }}"
-    cluster_id: "{{ trigger.event.data.cluster_id }}"
-    endpoint_id: "{{ trigger.event.data.endpoint_id }}"
+    command: "{{ trigger.event.data.new_state.state }}"
 - choose:
   - conditions:
     - "{{ command == 'on' }}"
-    - "{{ cluster_id == 6 }}"
-    - "{{ endpoint_id == 1 }}"
     sequence:
     - service: light.turn_on
       target: !input 'light'
@@ -45,17 +47,13 @@ action:
         transition: 1
   - conditions:
     - "{{ command == 'off' }}"
-    - "{{ cluster_id == 6 }}"
-    - "{{ endpoint_id == 1 }}"
     sequence:
     - service: light.turn_off
       target: !input 'light'
       data:
         transition: 1
   - conditions:
-    - "{{ command == 'move_with_on_off' }}"
-    - "{{ cluster_id == 8 }}"
-    - "{{ endpoint_id == 1 }}"
+    - "{{ command == 'brightness_move_up' }}"
     sequence:
       repeat:
         while:
@@ -69,9 +67,7 @@ action:
             brightness_step_pct: 10
         - delay: 1
   - conditions:
-    - "{{ command == 'move' }}"
-    - "{{ cluster_id == 8 }}"
-    - "{{ endpoint_id == 1 }}"
+    - "{{ command == 'brightness_move_down' }}"
     sequence:
       repeat:
         while:
@@ -85,9 +81,7 @@ action:
             brightness_step_pct: -10
         - delay: 1
   - conditions:
-    - "{{ command == 'stop' }}"
-    - "{{ cluster_id == 8 }}"
-    - "{{ endpoint_id == 1 }}"
+    - "{{ command == 'brightness_stop' }}"
     sequence:
     - service: light.turn_on
       target: !input 'light'
