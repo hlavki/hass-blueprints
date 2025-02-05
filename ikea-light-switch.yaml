@@ -1,5 +1,5 @@
 blueprint:
-  name: Tradfri E1743 Switch to Light via zigbee2mqtt
+  name: IKEA Switch to Light via zigbee2mqtt [hlavki]
   description: "Updated to Z2M v2. Controls a light with a given TRADFRI on/off switch. \n\nShort Button press will toggle light for both Buttons (helpfull in darkness) \n\n Mode set to restart is mandatory for stop after long press to work."
   domain: automation
   input:
