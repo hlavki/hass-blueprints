@@ -1,5 +1,5 @@
 blueprint:
-  name: ZHA - IKEA Tradfri on/off switch
+  name: IKEA Tradfri on/off switch
   description: |
     "Control your light(s) with IKEA Tradfri on/off switch
     
@@ -7,14 +7,6 @@ blueprint:
     You can turn the lights On / Off, or hold the buttons to dim the lights"
   domain: automation
   input:
-    # remote:
-    #   name: Remote
-    #   description: The remote that will control the lights
-    #   selector:
-    #     device:
-    #       integration: mqtt
-    #       manufacturer: 'IKEA'
-    #       model: 'TRADFRI ON/OFF switch (E1743)'
     sensor_entity:
       name: Switch
       description: The action sensor for listening state changes
@@ -58,7 +50,7 @@ action:
       repeat:
         while:
         - condition: template
-          value_template: "{{ repeat.index < 10 }}"
+          value_template: "{{ light.brightness_pct <= 100 }}"
         sequence:
         - service: light.turn_on
           target: !input 'light'
@@ -72,7 +64,7 @@ action:
       repeat:
         while:
         - condition: template
-          value_template: "{{ repeat.index < 10 }}"
+          value_template: "{{ light.brightness_pct >= 0 }}"
         sequence:
         - service: light.turn_on
           target: !input 'light'
